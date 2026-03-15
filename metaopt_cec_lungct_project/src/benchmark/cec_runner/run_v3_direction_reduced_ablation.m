@@ -58,9 +58,16 @@ function cfg = fill_default_cfg(cfg)
     if ~isfield(cfg, 'algorithms')
         cfg.algorithms = {
             'V3_BASELINE', ...
-            'V3_DIR_SMALL_STEP', ...
-            'V3_DIR_SMALL_STEP_LATE_LOCAL_REFINE', ...
-            'V3_DIR_SMALL_STEP_GATE_LATE_LOCAL_REFINE'};
+            'V3_DIR_STAG_ONLY', ...
+            'V3_DIR_STAG_BOTTOM_HALF', ...
+            'V3_DIR_STAG_BOTTOM_HALF_LATE_REFINE'};
+    end
+
+    if ~isfield(cfg, 'include_clipped_variant')
+        cfg.include_clipped_variant = true;
+    end
+    if cfg.include_clipped_variant && ~ismember('V3_DIR_CLIPPED_STAG_BOTTOM_HALF_LATE_REFINE', cfg.algorithms)
+        cfg.algorithms{end + 1} = 'V3_DIR_CLIPPED_STAG_BOTTOM_HALF_LATE_REFINE';
     end
 
     if ~isfield(cfg, 'dim')
@@ -284,41 +291,57 @@ function answers = build_required_answers(ranking, best_version, recommend_full_
         return;
     end
 
-    row_local = ranking(strcmp(ranking.algorithm, "V3_DIR_SMALL_STEP_LATE_LOCAL_REFINE"), :);
-    row_gate = ranking(strcmp(ranking.algorithm, "V3_DIR_SMALL_STEP_GATE_LATE_LOCAL_REFINE"), :);
+    row_stag_only = ranking(strcmp(ranking.algorithm, "V3_DIR_STAG_ONLY"), :);
+    row_bottom = ranking(strcmp(ranking.algorithm, "V3_DIR_STAG_BOTTOM_HALF"), :);
+    row_bottom_refine = ranking(strcmp(ranking.algorithm, "V3_DIR_STAG_BOTTOM_HALF_LATE_REFINE"), :);
+    row_clipped = ranking(strcmp(ranking.algorithm, "V3_DIR_CLIPPED_STAG_BOTTOM_HALF_LATE_REFINE"), :);
 
-    if ~isempty(row_local)
-        if row_local.simple_mean_delta(1) > 0
-            answers.q1 = sprintf('F1/F2/F3 shows repair tendency (simple_mean_delta=%.4g > 0).', row_local.simple_mean_delta(1));
-        else
-            answers.q1 = sprintf('F1/F2/F3 not repaired yet (simple_mean_delta=%.4g <= 0).', row_local.simple_mean_delta(1));
-        end
-
-        if row_local.complex_mean_delta(1) >= 0
-            answers.q2 = sprintf('F12/F13/F14/F15/F18/F19 directional advantage is retained (complex_mean_delta=%.4g).', row_local.complex_mean_delta(1));
-        else
-            answers.q2 = sprintf('Complex-function advantage weakened (complex_mean_delta=%.4g).', row_local.complex_mean_delta(1));
-        end
-
-        if row_local.net_gain(1) > 0
-            answers.q3 = sprintf('late_local_refine is effective in this screen (net_gain=%d).', row_local.net_gain(1));
-        else
-            answers.q3 = sprintf('late_local_refine is not yet effective enough (net_gain=%d).', row_local.net_gain(1));
-        end
-    else
-        answers.q1 = 'Cannot answer F1/F2/F3 repair because LATE_LOCAL_REFINE row is missing.';
-        answers.q2 = 'Cannot answer complex retention because LATE_LOCAL_REFINE row is missing.';
-        answers.q3 = 'Cannot evaluate late_local_refine due to missing row.';
+    primary_row = row_bottom_refine;
+    if isempty(primary_row)
+        primary_row = row_bottom;
+    end
+    if isempty(primary_row)
+        primary_row = row_stag_only;
     end
 
-    if ~isempty(row_local) && ~isempty(row_gate)
-        if (row_gate.std_delta_mean(1) <= row_local.std_delta_mean(1)) && (row_gate.net_gain(1) >= row_local.net_gain(1))
-            answers.q4 = 'gate + late_local_refine is more stable or equally stable while preserving gain.';
+    if ~isempty(primary_row)
+        if primary_row.simple_mean_delta(1) > 0
+            answers.q1 = sprintf('F1/F2/F3 shows repair tendency (simple_mean_delta=%.4g > 0).', primary_row.simple_mean_delta(1));
         else
-            answers.q4 = 'gate + late_local_refine did not show better stability-gain balance in this screen.';
+            answers.q1 = sprintf('F1/F2/F3 not repaired yet (simple_mean_delta=%.4g <= 0).', primary_row.simple_mean_delta(1));
+        end
+
+        if primary_row.complex_mean_delta(1) >= 0
+            answers.q2 = sprintf('F12/F13/F14/F15/F18/F19 directional advantage is retained (complex_mean_delta=%.4g).', primary_row.complex_mean_delta(1));
+        else
+            answers.q2 = sprintf('Complex-function advantage weakened (complex_mean_delta=%.4g).', primary_row.complex_mean_delta(1));
+        end
+
+        if ~isempty(row_bottom_refine) && ~isempty(row_bottom)
+            if row_bottom_refine.net_gain(1) >= row_bottom.net_gain(1)
+                answers.q3 = 'state-triggered late_local_refine helps or maintains net_gain under bottom-half directional policy.';
+            else
+                answers.q3 = 'state-triggered late_local_refine is not yet consistently beneficial and needs threshold tuning.';
+            end
+        elseif primary_row.net_gain(1) > 0
+            answers.q3 = sprintf('late_local_refine branch is acceptable in this screen (net_gain=%d).', primary_row.net_gain(1));
+        else
+            answers.q3 = sprintf('late_local_refine is not yet effective enough (net_gain=%d).', primary_row.net_gain(1));
         end
     else
-        answers.q4 = 'Cannot compare gate stability due to missing rows.';
+        answers.q1 = 'Cannot answer F1/F2/F3 repair because directional candidate rows are missing.';
+        answers.q2 = 'Cannot answer complex retention because directional candidate rows are missing.';
+        answers.q3 = 'Cannot evaluate late_local_refine due to missing rows.';
+    end
+
+    if ~isempty(row_bottom_refine) && ~isempty(row_clipped)
+        if (row_clipped.std_delta_mean(1) <= row_bottom_refine.std_delta_mean(1)) && (row_clipped.simple_mean_delta(1) >= row_bottom_refine.simple_mean_delta(1))
+            answers.q4 = 'clipped directional step improves stability/simple-protection balance over non-clipped counterpart.';
+        else
+            answers.q4 = 'clipped directional step did not yet show a better stability-gain balance in this screen.';
+        end
+    else
+        answers.q4 = 'Cannot compare clipped-step stability due to missing rows.';
     end
 
     answers.q5 = sprintf('Best candidate for full formal from this screen: %s.', best_version);

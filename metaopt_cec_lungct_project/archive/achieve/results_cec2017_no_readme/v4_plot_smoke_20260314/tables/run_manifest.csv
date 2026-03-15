@@ -1,0 +1,4 @@
+algorithm_name,suite,function_id,run_id,seed,maxFEs,used_FEs,fe_control_mode,status,error_message
+BBO_BASE,cec2017,1,1,20260315,3000,3000,exact_derived_iteration_from_maxFEs,completed,""
+BBO_IMPROVED_V3,cec2017,1,1,20261315,3000,3000,exact_derived_iteration_from_maxFEs_with_hard_stop,stopped_at_budget,"Reached maxFEs=3000, objective evaluation is stopped."
+BBO_IMPROVED_V4,cec2017,1,1,20262315,3000,3000,exact_derived_iteration_from_maxFEs_with_hard_stop,stopped_at_budget,"Reached maxFEs=3000, objective evaluation is stopped."

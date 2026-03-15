@@ -1,0 +1,4 @@
+algorithm_name,is_runnable,entry_name,algorithm_dir,budget_arg,fe_control_mode,note
+BBO_BASE,1,BBO,D:\project\科研\metaopt_cec_lungct_project\src\benchmark\cec_runner\..\..\..\src\baselines\metaheuristics\BBO\Source_code_BBO_MATLAB_VERSION_extracted\Source_code_BBO_MATLAB_VERSION\CEC2017,max_iter,exact_derived_iteration_from_maxFEs,BBO uses iteration budget; derived Max_iteration=99 gives exact used_FEs=3000.
+BBO_IMPROVED_V3,1,BBO_improved_v3,D:\project\科研\metaopt_cec_lungct_project\src\benchmark\cec_runner\..\..\..\src\improved\algorithms\BBO,max_iter,exact_derived_iteration_from_maxFEs,BBO_improved_v3 uses iteration budget; derived Max_iteration=99 gives exact used_FEs=3000.
+BBO_IMPROVED_V4,1,BBO_improved_v4,D:\project\科研\metaopt_cec_lungct_project\src\benchmark\cec_runner\..\..\..\src\improved\algorithms\BBO,max_iter,exact_derived_iteration_from_maxFEs,BBO_improved_v4 uses iteration budget; derived Max_iteration=99 gives exact used_FEs=3000.

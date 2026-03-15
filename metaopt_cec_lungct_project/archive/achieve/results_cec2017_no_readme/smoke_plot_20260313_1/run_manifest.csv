@@ -1,0 +1,5 @@
+algorithm_name,suite,function_id,run_id,seed,maxFEs,used_FEs,fe_control_mode,status,error_message
+BBO,cec2017,1,1,20260314,400,400,exact_derived_iteration_from_maxFEs,completed,
+BBO,cec2017,1,2,20260315,400,400,exact_derived_iteration_from_maxFEs,completed,
+SBO,cec2017,1,1,20261314,400,400,exact_fes_parameter,completed,
+SBO,cec2017,1,2,20261315,400,400,exact_fes_parameter,completed,

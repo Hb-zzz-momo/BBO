@@ -1,0 +1,10 @@
+[2026-03-13 16:17:18.892] Start experiment: smoke_plot_20260313_2
+[2026-03-13 16:17:18.940] Suite: cec2017
+[2026-03-13 16:17:18.958] Primary budget maxFEs: 400
+[2026-03-13 16:17:19.730] Algorithm BBO | runnable=1 | entry=BBO | budget=max_iter | fe_mode=exact_derived_iteration_from_maxFEs | note=BBO uses iteration budget; derived Max_iteration=19 gives exact used_FEs=400.
+[2026-03-13 16:17:19.741] Algorithm SBO | runnable=1 | entry=SBO | budget=maxFEs | fe_mode=exact_fes_parameter | note=SBO uses MaxFEs directly; counted wrapper records used_FEs.
+[2026-03-13 16:17:19.918] Running BBO on F1 ...
+[2026-03-13 16:17:20.123] Done BBO F1 run 1/1: best=499068631.371, used_FEs=400/400, t=0.0370s, mode=exact_derived_iteration_from_maxFEs, status=completed
+[2026-03-13 16:17:20.225] Running SBO on F1 ...
+[2026-03-13 16:17:20.313] Done SBO F1 run 1/1: best=5055778737.41, used_FEs=400/400, t=0.0292s, mode=exact_fes_parameter, status=completed
+[2026-03-13 16:17:28.186] Finished experiment: smoke_plot_20260313_2

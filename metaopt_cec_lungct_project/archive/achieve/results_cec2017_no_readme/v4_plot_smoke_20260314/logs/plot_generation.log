@@ -1,0 +1,7 @@
+[2026-03-14 14:48:32.652] [Plot] enabled=1 show=0 save=1
+[2026-03-14 14:48:32.736] [Plot] Generating convergence_curves.
+[2026-03-14 14:48:46.527] [Plot] saved: D:\project\科研\metaopt_cec_lungct_project\src\benchmark\cec_runner\..\..\..\results\cec2017\v4_plot_smoke_20260314\figures\convergence_curves\D10\convergence_cec2017_D10_F1.png
+[2026-03-14 14:48:46.653] [Plot] Generating boxplots.
+[2026-03-14 14:48:46.667] [Plot] skipped boxplots F1: insufficient multi-run final-best data
+[2026-03-14 14:48:46.674] [Plot] Generating friedman_radar.
+[2026-03-14 14:48:46.696] [Plot] skipped friedman_radar: need at least two algorithms and two comparable functions

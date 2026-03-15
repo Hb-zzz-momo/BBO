@@ -1,0 +1,2 @@
+progress_id,stage,task_name,status,goal,current_conclusion,next_step,updated_at
+P-20260315-001,ablation,"V3 消融实验：双目标消融 + directional 保守方向验证",analyzing,"提升简单函数收敛并验证 directional 保守触发，判断 v3 主线去向","已完成smoke+formal实跑(20260315_175032)：SMOKE_PASS=1，best=V3_DIR_STAG_BOTTOM_HALF，simple仍负、complex为正，recommend_full_formal=0","保持协议不变，优先调tau_dir/alpha_dir/cap/tau_refine后再跑reduced formal","2026-03-15 17:50:32"

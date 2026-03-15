@@ -1,0 +1,13 @@
+[2026-03-14 14:48:00.950] Start experiment: v4_plot_smoke_20260314
+[2026-03-14 14:48:00.992] Suite: cec2017
+[2026-03-14 14:48:01.005] Primary budget maxFEs: 3000
+[2026-03-14 14:48:02.022] Algorithm BBO_BASE | runnable=1 | entry=BBO | budget=max_iter | fe_mode=exact_derived_iteration_from_maxFEs | note=BBO uses iteration budget; derived Max_iteration=99 gives exact used_FEs=3000.
+[2026-03-14 14:48:02.038] Algorithm BBO_IMPROVED_V3 | runnable=1 | entry=BBO_improved_v3 | budget=max_iter | fe_mode=exact_derived_iteration_from_maxFEs | note=BBO_improved_v3 uses iteration budget; derived Max_iteration=99 gives exact used_FEs=3000.
+[2026-03-14 14:48:02.073] Algorithm BBO_IMPROVED_V4 | runnable=1 | entry=BBO_improved_v4 | budget=max_iter | fe_mode=exact_derived_iteration_from_maxFEs | note=BBO_improved_v4 uses iteration budget; derived Max_iteration=99 gives exact used_FEs=3000.
+[2026-03-14 14:48:02.375] Running BBO_BASE on F1 ...
+[2026-03-14 14:48:12.535] Done BBO_BASE F1 run 1/1: best=2475.25505238, used_FEs=3000/3000, t=9.9943s, mode=exact_derived_iteration_from_maxFEs, status=completed
+[2026-03-14 14:48:12.633] Running BBO_IMPROVED_V3 on F1 ...
+[2026-03-14 14:48:22.647] Done BBO_IMPROVED_V3 F1 run 1/1: best=6811.89330161, used_FEs=3000/3000, t=9.9412s, mode=exact_derived_iteration_from_maxFEs_with_hard_stop, status=stopped_at_budget
+[2026-03-14 14:48:22.736] Running BBO_IMPROVED_V4 on F1 ...
+[2026-03-14 14:48:32.448] Done BBO_IMPROVED_V4 F1 run 1/1: best=948001.26638, used_FEs=3000/3000, t=9.6664s, mode=exact_derived_iteration_from_maxFEs_with_hard_stop, status=stopped_at_budget
+[2026-03-14 14:48:46.701] Finished experiment: v4_plot_smoke_20260314

@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDM&CI Optimization Framework - Execution Flow Diagram</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .flow-container {
+            padding: 40px;
+        }
+        
+        .phase {
+            margin-bottom: 40px;
+            border-left: 5px solid #3498db;
+            padding-left: 20px;
+        }
+        
+        .phase-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .phase-number {
+            background: #3498db;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .step-title {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .step-description {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .code-snippet {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .code-snippet pre {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            color: inherit;
+            font-family: inherit;
+            font-size: inherit;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        
+        .data-structure {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .data-structure-title {
+            font-weight: bold;
+            color: #27ae60;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #3498db;
+            margin: 20px 0;
+        }
+        
+        .flow-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .flow-box {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 200px;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .flow-arrow {
+            font-size: 2em;
+            color: #74b9ff;
+            margin: 0 10px;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            color: #721c24;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            color: #155724;
+        }
+        
+        .loop-indicator {
+            border: 3px dashed #e74c3c;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #fdf2f2;
+        }
+        
+        .loop-title {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .flow-diagram {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+            
+            .container {
+                margin: 10px;
+            }
+            
+            .flow-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 MDM&CI Optimization Framework</h1>
+            <p>Complete Execution Flow Diagram - From run_exp.py to Optimization Results</p>
+        </div>
+        
+        <div class="flow-container">
+            <!-- Phase 1: Entry Point -->
+            <div class="phase">
+                <div class="phase-title">
+                    <div class="phase-number">1</div>
+                    Entry Point: run_exp.py
+                </div>
+                
+                <div class="step">
+                    <div class="step-title">🚀 Script Initialization</div>
+                    <div class="step-description">
+                        The optimization process begins with run_exp.py, which sets up the experimental configuration and coordinates the entire optimization workflow.
+                    </div>
+                    <div class="code-snippet"><pre># Configuration Setup
+SEARCH_AGENTS_NO = 30      # Population size
+DIM = 10                   # Problem dimension
+MAX_EPOCHS = 1000          # Maximum iterations
+RUNS = 4                   # Independent runs
+benchmark_name = 'CEC2017'
+
+# Algorithm Selection
+algorithm_classes = [
+    PLO.OriginalPLO,
+    RIME.OriginalRIME,
+    SBO.OriginalSBO
+]</pre></div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-title">📊 Benchmark Function Loading</div>
+                    <div class="step-description">
+                        Dynamically imports CEC benchmark functions using opfunu library and discovers available test functions.
+                    </div>
+                    <div class="code-snippet"><pre># Dynamic CEC module import
+cec_module = importlib.import_module(
+    f"opfunu.cec_based.{benchmark_name.lower()}"
+)
+
+# Function discovery and initialization
+func_class = getattr(cec_module, func_class_name)
+func_obj = func_class(dimension)
+
+# Extract function properties
+lb, ub = func_obj.lb, func_obj.ub
+fhd = func_obj.evaluate</pre></div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-title">🎯 Problem Definition</div>
+                    <div class="step-description">
+                        Creates the optimization problem dictionary that will be passed to the mealpy optimizer.
+                    </div>
+                    <div class="code-snippet"><pre>problem = {
+    "obj_func": fhd,                      # Objective function
+    "bounds": FloatVar(lb=lb, ub=ub),     # Variable bounds
+    "minmax": "min",                      # Minimization problem
+    "name": cec_func_id,                  # Problem identifier
+}</pre></div>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <!-- Phase 2: Optimizer Initialization -->
+            <div class="phase">
+                <div class="phase-title">
+                    <div class="phase-number">2</div>
+                    Optimizer Initialization
+                </div>
+                
+                <div class="step">
+                    <div class="step-title">🏗️ Algorithm Instantiation</div>
+                    <div class="step-description">
+                        Each algorithm class is instantiated with specified parameters. The base Optimizer class initializes core components.
+                    </div>
+                    <div class="code-snippet"><pre># Algorithm instantiation
+model = algo_class(
+    epoch=MAX_EPOCHS,
+    pop_size=SEARCH_AGENTS_NO
+)
+
+# Base Optimizer initialization (__init__)
+def __init__(self, **kwargs):
+    self.epoch, self.pop_size = None, None
+    self.pop, self.g_best, self.g_worst = None, Agent(), None
+    self.problem, self.logger, self.history = None, None, None
+    self.nfe_counter = -1  # Function evaluation counter
+    self.__set_keyword_arguments(kwargs)</pre></div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-title">🔧 solve() Method Invocation</div>
+                    <div class="step-description">
+                        The main solve() method is called, which orchestrates the entire optimization process.
+                    </div>
+                    <div class="code-snippet"><pre>best_solution = model.solve(problem)
+
+# solve() method workflow:
+def solve(self, problem, mode='single', n_workers=None,
+          termination=None, starting_solutions=None, seed=None):
+    # 1. Problem validation and setup
+    self.check_problem(problem, seed)
+
+    # 2. Mode and worker configuration
+    self.check_mode_and_workers(mode, n_workers)
+
+    # 3. Termination criteria setup
+    self.check_termination("start", termination, None)
+
+    # 4. Variable initialization
+    self.initialize_variables()
+
+    # 5. Population initialization
+    self.before_initialization(starting_solutions)
+    self.initialization()
+    self.after_initialization()
+
+    # 6. Main optimization loop
+    # 7. Result tracking and return</pre></div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇️</div>
+
+            <!-- Phase 3: Problem Setup -->
+            <div class="phase">
+                <div class="phase-title">
+                    <div class="phase-number">3</div>
+                    Problem Setup Phase
+                </div>
+
+                <div class="step">
+                    <div class="step-title">✅ Problem Validation</div>
+                    <div class="step-description">
+                        The solve() method first validates and sets up the optimization problem, ensuring all components are properly configured.
+                    </div>
+                    <div class="code-snippet"><pre>def solve(self, problem, mode='single', n_workers=None,
+          termination=None, starting_solutions=None, seed=None):
+    """
+    Main optimization method that coordinates the entire process
+    """
+    # Problem validation and setup
+    self.check_problem(problem, seed)
+    self.check_mode_and_workers(mode, n_workers)
+    self.check_termination("start", termination, None)
+    self.initialize_variables()</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🎛️ Parameter Configuration</div>
+                    <div class="step-description">
+                        Sets up execution mode (single/parallel), worker configuration, and termination criteria.
+                    </div>
+                    <div class="highlight">
+                        <strong>Execution Modes:</strong><br>
+                        • <strong>single</strong>: Sequential mode affecting other agents<br>
+                        • <strong>swarm</strong>: Sequential mode without agent interaction<br>
+                        • <strong>thread</strong>: Parallel mode with multiple threads<br>
+                        • <strong>process</strong>: Parallel mode with multiple cores
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">📝 History and Logger Setup</div>
+                    <div class="step-description">
+                        Initializes tracking components for monitoring optimization progress and storing historical data.
+                    </div>
+                    <div class="code-snippet"><pre># History initialization
+self.history = History(
+    log_to=self.problem.log_to,
+    log_file=self.problem.log_file
+)
+
+# Key tracking lists initialized:
+class History:
+    def __init__(self):
+        self.list_global_best = []      # Global best solutions over time
+        self.list_current_best = []     # Current best in each generation
+        self.list_global_best_fit = []  # Global best fitness values
+        self.list_diversity = []        # Population diversity metrics
+        self.list_epoch_time = []       # Runtime per generation</pre></div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇️</div>
+
+            <!-- Phase 4: Population Initialization -->
+            <div class="phase">
+                <div class="phase-title">
+                    <div class="phase-number">4</div>
+                    Population Initialization
+                </div>
+
+                <div class="step">
+                    <div class="step-title">👥 Population Generation</div>
+                    <div class="step-description">
+                        Creates the initial population of candidate solutions, each represented as an Agent object.
+                    </div>
+                    <div class="code-snippet"><pre>def initialization(self):
+    """Initialize population if not already created"""
+    if self.pop is None:
+        self.pop = self.generate_population(self.pop_size)
+
+def generate_population(self, pop_size):
+    """Generate initial population of agents"""
+    if self.mode in self.PARALLEL_MODES:
+        # Parallel population generation
+        pop = self.create_population_parallel(pop_size)
+    else:
+        # Sequential generation
+        pop = [self.generate_agent() for _ in range(pop_size)]
+    return pop
+
+def generate_agent(self, solution=None):
+    """Create a single agent with fitness evaluation"""
+    agent = self.generate_empty_agent(solution)
+    agent.target = self.get_target(agent.solution)
+    return agent</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🎯 Initial Fitness Evaluation</div>
+                    <div class="step-description">
+                        Each agent's solution is evaluated using the objective function to determine initial fitness values.
+                    </div>
+                    <div class="code-snippet"><pre>def get_target(self, solution, counted=True):
+    """Evaluate solution and return Target object"""
+    if counted:
+        self.nfe_counter += 1  # Increment function evaluation counter
+    return self.problem.get_target(solution)
+
+# Problem.get_target() implementation:
+def get_target(self, solution):
+    """Calculate objectives and create Target object"""
+    objs = self.obj_func(solution)  # Call objective function
+    return Target(
+        objectives=objs,
+        weights=self.obj_weights
+    )</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🏆 Best/Worst Agent Identification</div>
+                    <div class="step-description">
+                        Identifies the best and worst agents in the initial population and stores them for tracking.
+                    </div>
+                    <div class="code-snippet"><pre>def after_initialization(self):
+    """Process initial population and identify best/worst agents"""
+    # Find best and worst agents in initial population
+    pop_temp, best, worst = self.get_special_agents(
+        self.pop,
+        n_best=1,
+        n_worst=1,
+        minmax=self.problem.minmax
+    )
+
+    # Set global best and worst
+    self.g_best, self.g_worst = best[0], worst[0]
+
+    # Sort population if algorithm requires it
+    if self.sort_flag:
+        self.pop = pop_temp
+
+    # Store initial best and worst in history
+    self.history.store_initial_best_worst(
+        self.g_best,
+        self.g_worst
+    )</pre></div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇️</div>
+
+            <!-- Phase 5: Main Optimization Loop -->
+            <div class="phase">
+                <div class="phase-title">
+                    <div class="phase-number">5</div>
+                    Main Optimization Loop
+                </div>
+
+                <div class="loop-indicator">
+                    <div class="loop-title">🔄 Iterative Optimization Process</div>
+                    <div class="step-description">
+                        The core optimization loop runs for the specified number of epochs, continuously improving the population.
+                    </div>
+                    <div class="code-snippet"><pre># Algorithm-specific pre-loop setup
+self.before_main_loop()
+
+# Main optimization loop
+for epoch in range(1, self.epoch + 1):
+    time_epoch = time.perf_counter()
+
+    # Algorithm-specific evolution step
+    self.evolve(epoch)
+
+    # Update global best solution
+    pop_temp, self.g_best = self.update_global_best_agent(self.pop)
+    if self.sort_flag:
+        self.pop = pop_temp
+
+    # Track progress and check termination
+    time_epoch = time.perf_counter() - time_epoch
+    self.track_optimize_step(self.pop, epoch, time_epoch)
+
+    # Check if termination criteria are met
+    if self.check_termination("end", None, epoch):
+        break
+
+# Finalize optimization process
+self.track_optimize_process()
+return self.g_best</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🧬 Algorithm-Specific Evolution</div>
+                    <div class="step-description">
+                        Each algorithm implements its own evolve() method containing the core optimization logic.
+                    </div>
+
+                    <div class="data-structure">
+                        <div class="data-structure-title">Example: PLO (Polar Lights Optimizer) Evolution</div>
+                        <div class="code-snippet"><pre>def evolve(self, epoch):
+    """PLO (Polar Lights Optimizer) evolution step"""
+    # Calculate adaptive parameters
+    progress_ratio = epoch / self.epoch
+    x_mean = np.mean([agent.solution for agent in self.pop], axis=0)
+
+    # Adaptive weights
+    w1 = np.tanh((progress_ratio) ** 4)
+    w2 = np.exp(-(2 * progress_ratio) ** 3)
+    E = np.sqrt(progress_ratio)
+
+    # Generate random permutation for collision pairs
+    A = self.generator.permutation(self.pop_size)
+
+    pop_new = []
+    for idx in range(self.pop_size):
+        # Aurora oval walk
+        a = self.generator.uniform() / 2 + 1
+        V = np.exp((1 - a) / 100 * epoch)
+        LS = V
+
+        # Levy flight movement component
+        GS = self.levy(self.problem.n_dims) * (
+            x_mean - self.pop[idx].solution +
+            (self.problem.lb + self.generator.uniform(0, 1, self.problem.n_dims) *
+             (self.problem.ub - self.problem.lb)) / 2
+        )
+
+        # Position update based on aurora oval walk
+        pos_new = self.pop[idx].solution + (w1 * LS + w2 * GS) * \
+                  self.generator.uniform(0, 1, self.problem.n_dims)
+
+        # Particle collision mechanism
+        for j in range(self.problem.n_dims):
+            if (self.generator.random() < 0.05) and (self.generator.random() < E):
+                pos_new[j] = self.pop[idx].solution[j] + \
+                           np.sin(self.generator.random() * np.pi) * \
+                           (self.pop[idx].solution[j] - self.pop[A[idx]].solution[j])
+
+        # Ensure position is within bounds
+        pos_new = self.correct_solution(pos_new)
+        agent = self.generate_empty_agent(pos_new)
+        pop_new.append(agent)</pre></div>
+                    </div>
+
+                    <div class="data-structure">
+                        <div class="data-structure-title">Example: RIME Evolution</div>
+                        <div class="code-snippet"><pre>def evolve(self, epoch):
+    """RIME (RIME Ice Marine-predator Optimizer) evolution step"""
+    # RIME-specific parameters
+    rime_factor = (self.generator.random() - 0.5) * 2 * \
+                  np.cos(np.pi * epoch / (self.epoch / 10)) * \
+                  (1 - np.round(epoch * self.sr / self.epoch) / self.sr)
+
+    ee = np.sqrt((epoch + 1) / self.epoch)
+
+    # Normalize fitness values
+    fits = np.array([agent.target.fitness for agent in self.pop]).reshape((1, -1))
+    fits_norm = fits / np.linalg.norm(fits, axis=1, keepdims=True)
+
+    LB = self.problem.lb
+    UB = self.problem.ub
+    pop_new = []
+
+    for idx in range(self.pop_size):
+        pos_new = self.pop[idx].solution.copy()
+
+        for jdx in range(self.problem.n_dims):
+            # Soft-rime search strategy
+            if self.generator.random() < ee:
+                pos_new[jdx] = self.g_best.solution[jdx] + \
+                              rime_factor * (LB[jdx] + self.generator.random() *
+                                           (UB[jdx] - LB[jdx]))
+
+            # Hard-rime puncture mechanism
+            if self.generator.random() < fits_norm[0, idx]:
+                pos_new[jdx] = self.g_best.solution[jdx]
+
+        pos_new = self.correct_solution(pos_new)
+        agent = self.generate_empty_agent(pos_new)
+        pop_new.append(agent)</pre></div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🔄 Fitness Evaluation and Selection</div>
+                    <div class="step-description">
+                        After generating new solutions, fitness evaluation and selection mechanisms determine which solutions survive.
+                    </div>
+                    <div class="code-snippet"><pre># Fitness evaluation and selection based on execution mode
+if self.mode in self.AVAILABLE_MODES:
+    # Parallel/batch processing modes
+    pop_new = self.update_target_for_population(pop_new)
+    self.pop = self.greedy_selection_population(
+        self.pop,
+        pop_new,
+        self.problem.minmax
+    )
+else:
+    # Sequential 'single' mode with immediate comparison
+    for idx in range(self.pop_size):
+        agent.target = self.get_target(pos_new)
+        self.pop[idx] = self.get_better_agent(
+            agent,
+            self.pop[idx],
+            self.problem.minmax
+        )</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">📊 Progress Tracking</div>
+                    <div class="step-description">
+                        Each iteration tracks optimization progress, updates global best, and stores historical data.
+                    </div>
+                    <div class="code-snippet"><pre>def track_optimize_step(self, pop, epoch, runtime):
+    """Track optimization progress for current epoch"""
+    # Update global best and worst
+    current_best = self.get_best_agent(pop, self.problem.minmax)
+    current_worst = self.get_worst_agent(pop, self.problem.minmax)
+
+    # Store current epoch data in history
+    self.history.list_current_best.append(current_best)
+    self.history.list_current_worst.append(current_worst)
+    self.history.list_epoch_time.append(runtime)
+    self.history.list_global_best_fit.append(self.g_best.target.fitness)
+    self.history.list_current_best_fit.append(current_best.target.fitness)
+
+    # Calculate and store population diversity
+    diversity = self.calculate_diversity(pop)
+    self.history.list_diversity.append(diversity)
+
+    # Optional: Store complete population (memory intensive)
+    if self.problem.save_population:
+        self.history.list_population.append([agent.copy() for agent in pop])</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🛑 Termination Checking</div>
+                    <div class="step-description">
+                        Checks various termination criteria to determine if optimization should stop early.
+                    </div>
+                    <div class="warning">
+                        <strong>Termination Criteria:</strong><br>
+                        • Maximum epochs reached<br>
+                        • Maximum function evaluations exceeded<br>
+                        • Maximum time limit reached<br>
+                        • Early stopping (fitness stagnation)<br>
+                        • Target fitness achieved
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇️</div>
+
+            <!-- Phase 6: Data Structures -->
+            <div class="phase">
+                <div class="phase-title">
+                    <div class="phase-number">6</div>
+                    Key Data Structures
+                </div>
+
+                <div class="data-structure">
+                    <div class="data-structure-title">🤖 Agent Structure</div>
+                    <div class="step-description">
+                        Each solution in the population is represented as an Agent object containing the solution vector and target information.
+                    </div>
+                    <div class="code-snippet"><pre>class Agent:
+    """Individual solution in the population"""
+    ID = 0  # Class variable for unique IDs
+
+    def __init__(self, solution=None, target=None, **kwargs):
+        self.solution = solution      # np.ndarray: Decision variables
+        self.target = target         # Target object: Fitness information
+        self.id = self.increase()    # Unique identifier
+        self.kwargs = kwargs         # Algorithm-specific attributes
+        self.set_kwargs(kwargs)
+
+    @classmethod
+    def increase(cls):
+        """Generate unique ID for each agent"""
+        cls.ID += 1
+        return cls.ID
+
+    def is_better_than(self, other_agent, minmax="min"):
+        """Compare fitness with another agent"""
+        if minmax == "min":
+            return self.target.fitness < other_agent.target.fitness
+        else:
+            return self.target.fitness > other_agent.target.fitness
+
+    def copy(self):
+        """Create deep copy of agent"""
+        return Agent(self.solution, self.target.copy(), **self.kwargs)
+
+    def update_agent(self, solution, target):
+        """Update agent's solution and target"""
+        self.solution = solution
+        self.target = target
+
+# Algorithm-specific attributes examples:
+# - SBO: social_flags, local_elite_pop
+# - PSO: velocity, personal_best
+# - DE: trial_vector, mutation_factor
+# - GA: fitness_rank, selection_pressure</pre></div>
+                </div>
+
+                <div class="data-structure">
+                    <div class="data-structure-title">🎯 Target Structure</div>
+                    <div class="step-description">
+                        The Target object encapsulates objective values, weights, and computed fitness for each solution.
+                    </div>
+                    <div class="code-snippet"><pre>class Target:
+    """Encapsulates objective values and fitness calculation"""
+    SUPPORTED_ARRAY = [tuple, list, np.ndarray]
+
+    def __init__(self, objectives=None, weights=None):
+        self._objectives = None          # List/array of objective values
+        self._weights = None            # Weights for multi-objective problems
+        self._fitness = None           # Computed fitness value
+
+        self.set_objectives(objectives)
+        self.set_weights(weights)
+        self.calculate_fitness(self.weights)
+
+    def set_objectives(self, objectives):
+        """Set and validate objective values"""
+        if isinstance(objectives, (int, float)):
+            self._objectives = [objectives]
+        elif type(objectives) in self.SUPPORTED_ARRAY:
+            self._objectives = list(objectives)
+        else:
+            raise ValueError("Objectives must be numeric or array-like")
+
+    def calculate_fitness(self, weights):
+        """Calculate fitness from objectives and weights"""
+        if not (type(weights) in self.SUPPORTED_ARRAY and
+                len(weights) == len(self.objectives)):
+            weights = len(self.objectives) * (1.,)  # Equal weights
+
+        # For single-objective: fitness = objectives[0]
+        # For multi-objective: fitness = weighted sum
+        self._fitness = np.dot(weights, self.objectives)
+
+    @property
+    def fitness(self):
+        """Get computed fitness value"""
+        return self._fitness
+
+    @property
+    def objectives(self):
+        """Get objective values"""
+        return self._objectives
+
+    def copy(self):
+        """Create copy of target"""
+        return Target(self.objectives, self.weights)</pre></div>
+                </div>
+
+                <div class="data-structure">
+                    <div class="data-structure-title">👥 Population Structure (self.pop)</div>
+                    <div class="step-description">
+                        The population is a list of Agent objects, representing the current set of candidate solutions.
+                    </div>
+                    <div class="code-snippet"><pre># Population structure - List of Agent objects
+self.pop = [Agent_1, Agent_2, ..., Agent_N]
+
+# Each Agent contains:
+class Agent:
+    def __init__(self):
+        self.solution = np.array([x1, x2, ..., xD])  # D-dimensional solution
+        self.target = Target(
+            objectives=[obj1, obj2, ...],
+            fitness=f_value
+        )
+        self.id = unique_identifier
+        # Algorithm-specific attributes:
+        # self.velocity (PSO)
+        # self.personal_best (PSO)
+        # self.social_flags (SBO)
+        # self.local_elite (SBO)
+
+# Population operations:
+def get_sorted_population(pop, minmax="min"):
+    """Sort population by fitness"""
+    if minmax == "min":
+        return sorted(pop, key=lambda agent: agent.target.fitness)
+    else:
+        return sorted(pop, key=lambda agent: agent.target.fitness, reverse=True)
+
+def get_best_agent(pop, minmax="min"):
+    """Get best agent from population"""
+    sorted_pop = get_sorted_population(pop, minmax)
+    return sorted_pop[0].copy()
+
+def get_worst_agent(pop, minmax="min"):
+    """Get worst agent from population"""
+    sorted_pop = get_sorted_population(pop, minmax)
+    return sorted_pop[-1].copy()
+
+# Global tracking across all generations:
+self.g_best = best_agent_across_all_generations
+self.g_worst = worst_agent_across_all_generations</pre></div>
+                </div>
+
+                <div class="data-structure">
+                    <div class="data-structure-title">📈 History Structure</div>
+                    <div class="step-description">
+                        Comprehensive tracking of optimization progress across all generations.
+                    </div>
+                    <div class="code-snippet"><pre>class History:
+    """Comprehensive tracking of optimization progress"""
+
+    def __init__(self, **kwargs):
+        # Solution tracking
+        self.list_global_best = []      # Best solution found so far each epoch
+        self.list_current_best = []     # Best solution in current epoch
+        self.list_global_worst = []     # Worst solution tracking
+        self.list_current_worst = []    # Current worst solutions
+
+        # Fitness tracking
+        self.list_global_best_fit = []  # Global best fitness values
+        self.list_current_best_fit = [] # Current best fitness values
+
+        # Performance metrics
+        self.list_diversity = []        # Population diversity each epoch
+        self.list_exploration = []      # Exploration percentage
+        self.list_exploitation = []     # Exploitation percentage
+        self.list_epoch_time = []       # Runtime per epoch
+
+        # Optional: Full population history (memory intensive)
+        self.list_population = []       # Complete population each epoch
+
+        # Metadata
+        self.epoch = None              # Total epochs completed
+        self.log_to = kwargs.get('log_to', 'console')
+        self.log_file = kwargs.get('log_file', 'history.txt')
+
+    def store_initial_best_worst(self, best_agent, worst_agent):
+        """Store initial population's best and worst agents"""
+        self.list_global_best = [best_agent.copy()]
+        self.list_current_best = [best_agent.copy()]
+        self.list_global_worst = [worst_agent.copy()]
+        self.list_current_worst = [worst_agent.copy()]
+
+    def get_global_repeated_times(self, epsilon):
+        """Count consecutive epochs with similar global best fitness"""
+        count = 0
+        for idx in range(len(self.list_global_best) - 1):
+            diff = abs(self.list_global_best[idx].target.fitness -
+                      self.list_global_best[idx + 1].target.fitness)
+            if diff <= epsilon:
+                count += 1
+            else:
+                count = 0
+        return count</pre></div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇️</div>
+
+            <!-- Phase 7: Control Flow -->
+            <div class="phase">
+                <div class="phase-title">
+                    <div class="phase-number">7</div>
+                    Control Flow and Decision Points
+                </div>
+
+                <div class="flow-diagram">
+                    <div class="flow-box">
+                        <strong>Problem Setup</strong><br>
+                        Validate inputs<br>
+                        Initialize components
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">
+                        <strong>Population Init</strong><br>
+                        Generate agents<br>
+                        Evaluate fitness
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">
+                        <strong>Main Loop</strong><br>
+                        Evolve population<br>
+                        Update best/worst
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🔀 Execution Mode Branching</div>
+                    <div class="step-description">
+                        The framework supports different execution modes that affect how fitness evaluation and population updates are performed.
+                    </div>
+                    <div class="code-snippet"><pre># Mode-dependent execution flow
+if self.mode in self.AVAILABLE_MODES:
+    # Parallel/batch processing modes: ['process', 'thread', 'swarm']
+    pop_new = self.update_target_for_population(pop_new)
+    self.pop = self.greedy_selection_population(
+        self.pop,
+        pop_new,
+        self.problem.minmax
+    )
+else:
+    # 'single' mode: Sequential processing with immediate updates
+    for idx in range(self.pop_size):
+        agent.target = self.get_target(pos_new)
+        self.pop[idx] = self.get_better_agent(
+            agent,
+            self.pop[idx],
+            self.problem.minmax
+        )</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">⚡ Parallel Processing Flow</div>
+                    <div class="step-description">
+                        When parallel modes are enabled, fitness evaluations are distributed across multiple workers.
+                    </div>
+                    <div class="code-snippet"><pre>def update_target_for_population(self, pop):
+    """Update fitness for entire population based on execution mode"""
+    pos_list = [agent.solution for agent in pop]
+
+    if self.mode == "process":
+        # Multiprocessing with separate processes
+        from concurrent.futures import ProcessPoolExecutor
+        with ProcessPoolExecutor(max_workers=self.n_workers) as executor:
+            list_results = list(executor.map(
+                self.get_target_wrapper,
+                pos_list
+            ))
+
+    elif self.mode == "thread":
+        # Multithreading with shared memory
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=self.n_workers) as executor:
+            list_results = list(executor.map(
+                self.get_target_wrapper,
+                pos_list
+            ))
+
+    elif self.mode == "swarm":
+        # Sequential but independent evaluations (no agent interaction)
+        list_results = [self.get_target(pos) for pos in pos_list]
+
+    # Update population with new targets
+    for idx, target in enumerate(list_results):
+        pop[idx].target = target
+
+    # Increment function evaluation counter
+    self.nfe_counter += len(pop)
+    return pop
+
+def get_target_wrapper(self, solution):
+    """Wrapper for parallel target evaluation"""
+    return self.get_target(solution, counted=False)</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🎲 Selection and Replacement Strategies</div>
+                    <div class="step-description">
+                        Different algorithms employ various selection mechanisms to determine which solutions survive to the next generation.
+                    </div>
+                    <div class="highlight">
+                        <strong>Common Selection Strategies:</strong><br>
+                        • <strong>Greedy Selection</strong>: Keep better solution between parent and offspring<br>
+                        • <strong>Tournament Selection</strong>: Select best from random subset<br>
+                        • <strong>Elitism</strong>: Always preserve best solutions<br>
+                        • <strong>Roulette Wheel</strong>: Probability-based selection<br>
+                        • <strong>Rank-based</strong>: Selection based on fitness ranking
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇️</div>
+
+            <!-- Phase 8: Results and Convergence -->
+            <div class="phase">
+                <div class="phase-title">
+                    <div class="phase-number">8</div>
+                    Results and Convergence Analysis
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🏁 Optimization Completion</div>
+                    <div class="step-description">
+                        When the main loop terminates, final processing and result compilation occurs.
+                    </div>
+                    <div class="code-snippet"><pre># Final processing in solve() method
+self.track_optimize_process()  # Finalize history tracking
+return self.g_best            # Return best solution found
+
+def track_optimize_process(self):
+    """Finalize optimization tracking and calculate metrics"""
+    # Set total epochs completed
+    self.history.epoch = len(self.history.list_diversity)
+
+    # Calculate exploration/exploitation percentages
+    if self.history.list_diversity:
+        div_max = np.max(self.history.list_diversity)
+        self.history.list_exploration = 100 * (
+            np.array(self.history.list_diversity) / div_max
+        )
+        self.history.list_exploitation = 100 - self.history.list_exploration
+
+    # Clean up history lists (remove initialization entries)
+    self.history.list_global_best = self.history.list_global_best[1:]
+    self.history.list_current_best = self.history.list_current_best[1:]
+    self.history.list_global_worst = self.history.list_global_worst[1:]
+    self.history.list_current_worst = self.history.list_current_worst[1:]</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">📊 Result Extraction in run_exp.py</div>
+                    <div class="step-description">
+                        The run_exp.py script extracts key results and convergence data for analysis and visualization.
+                    </div>
+                    <div class="code-snippet"><pre># Result extraction after solve() completes
+start_time = time.time()
+best_solution = model.solve(problem)
+end_time = time.time()
+
+# Extract key metrics
+results[algo_idx] = best_solution.target.fitness
+
+# Extract and sample convergence curve
+cg_curve = model.history.list_global_best_fit
+sampled_curve = my_sampling(cg_curve, NUM_OF_RECORD)
+curves[algo_idx] = sampled_curve
+
+# Performance tracking and logging
+print(f"Algorithm {algorithm_names[algo_idx]}:")
+print(f"  Best Fitness = {results[algo_idx]:.6e}")
+print(f"  Runtime = {end_time - start_time:.2f}s")
+print(f"  Function Evaluations = {model.nfe_counter}")
+print(f"  Epochs Completed = {model.history.epoch}")</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">📈 Convergence Curve Generation</div>
+                    <div class="step-description">
+                        Convergence curves are generated to visualize optimization progress over iterations.
+                    </div>
+                    <div class="code-snippet"><pre># Convergence curve processing
+def my_sampling(data, num_points):
+    """Sample convergence curve to fixed number of points for visualization"""
+    if len(data) <= num_points:
+        return data
+
+    # Create evenly spaced indices
+    indices = np.linspace(0, len(data) - 1, num_points, dtype=int)
+    return [data[i] for i in indices]
+
+# Plotting convergence curves for all algorithms
+def plot_convergence_curves(mean_curves, algorithm_names, max_fes,
+                          title, save_path):
+    """Generate convergence plots comparing multiple algorithms"""
+    plt.figure(figsize=(12, 8))
+
+    for idx, (curve, name) in enumerate(zip(mean_curves, algorithm_names)):
+        plt.plot(curve, label=name, linewidth=2)
+
+    plt.xlabel('Function Evaluations')
+    plt.ylabel('Best Fitness Value (log scale)')
+    plt.yscale('log')
+    plt.title(title)
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
+
+# Call plotting function
+plot_convergence_curves(
+    mean_curves=np.nanmean(cg_curves, axis=1),
+    algorithm_names=algorithm_names,
+    max_fes=MAX_EPOCHS,
+    title=f'Convergence: {cec_func_id} ({benchmark_name})',
+    save_path=os.path.join(dir_name, f'{cec_func_id}_convergence.png')
+)</pre></div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">💾 Data Storage and Analysis</div>
+                    <div class="step-description">
+                        Final results are stored in various formats for statistical analysis and comparison.
+                    </div>
+                    <div class="success">
+                        <strong>Output Files Generated:</strong><br>
+                        • <strong>best_fitness_all.npy</strong>: Raw fitness data for all runs<br>
+                        • <strong>Convergence plots</strong>: PNG files showing optimization progress<br>
+                        • <strong>Excel reports</strong>: Statistical summaries and comparisons<br>
+                        • <strong>Log files</strong>: Detailed execution logs
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇️</div>
+
+            <!-- Summary -->
+            <div class="phase">
+                <div class="phase-title">
+                    <div class="phase-number">✅</div>
+                    Execution Flow Summary
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🔄 Complete Workflow</div>
+                    <div class="step-description">
+                        The MDM&CI optimization framework follows a systematic workflow from problem definition to result analysis.
+                    </div>
+
+                    <div class="flow-diagram">
+                        <div class="flow-box" style="background: linear-gradient(135deg, #00b894 0%, #00a085 100%);">
+                            <strong>1. Entry Point</strong><br>
+                            run_exp.py<br>
+                            Configuration
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);">
+                            <strong>2. Initialization</strong><br>
+                            Algorithm Setup<br>
+                            Problem Definition
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);">
+                            <strong>3. Population</strong><br>
+                            Generate Agents<br>
+                            Initial Evaluation
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);">
+                            <strong>4. Evolution</strong><br>
+                            Iterative Improvement<br>
+                            Selection & Update
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);">
+                            <strong>5. Results</strong><br>
+                            Best Solution<br>
+                            Analysis & Visualization
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">🎯 Key Takeaways</div>
+                    <div class="step-description">
+                        Understanding this execution flow helps in debugging, customizing algorithms, and optimizing performance.
+                    </div>
+                    <div class="highlight">
+                        <strong>Framework Benefits:</strong><br>
+                        • <strong>Modular Design</strong>: Easy to extend and customize<br>
+                        • <strong>Parallel Support</strong>: Scalable across multiple cores<br>
+                        • <strong>Comprehensive Tracking</strong>: Detailed optimization history<br>
+                        • <strong>Multiple Algorithms</strong>: Wide variety of optimization methods<br>
+                        • <strong>Standardized Interface</strong>: Consistent API across algorithms
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

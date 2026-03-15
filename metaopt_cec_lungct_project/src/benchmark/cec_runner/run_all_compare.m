@@ -642,6 +642,10 @@ function catalog = get_algorithm_catalog(paths, suite_api)
     catalog(end + 1) = make_algorithm_spec('V3_DIR_SMALL_STEP', 'BBO_v3_dir_small_step', improved_bbo_root, 'max_iter', 'score_pos_curve'); %#ok<AGROW>
     catalog(end + 1) = make_algorithm_spec('V3_DIR_SMALL_STEP_LATE_LOCAL_REFINE', 'BBO_v3_dir_small_step_late_local_refine', improved_bbo_root, 'max_iter', 'score_pos_curve'); %#ok<AGROW>
     catalog(end + 1) = make_algorithm_spec('V3_DIR_SMALL_STEP_GATE_LATE_LOCAL_REFINE', 'BBO_v3_dir_small_step_gate_late_local_refine', improved_bbo_root, 'max_iter', 'score_pos_curve'); %#ok<AGROW>
+    catalog(end + 1) = make_algorithm_spec('V3_DIR_STAG_ONLY', 'BBO_v3_dir_stag_only', improved_bbo_root, 'max_iter', 'score_pos_curve'); %#ok<AGROW>
+    catalog(end + 1) = make_algorithm_spec('V3_DIR_STAG_BOTTOM_HALF', 'BBO_v3_dir_stag_bottom_half', improved_bbo_root, 'max_iter', 'score_pos_curve'); %#ok<AGROW>
+    catalog(end + 1) = make_algorithm_spec('V3_DIR_STAG_BOTTOM_HALF_LATE_REFINE', 'BBO_v3_dir_stag_bottom_half_late_refine', improved_bbo_root, 'max_iter', 'score_pos_curve'); %#ok<AGROW>
+    catalog(end + 1) = make_algorithm_spec('V3_DIR_CLIPPED_STAG_BOTTOM_HALF_LATE_REFINE', 'BBO_v3_dir_clipped_stag_bottom_half_late_refine', improved_bbo_root, 'max_iter', 'score_pos_curve'); %#ok<AGROW>
     catalog(end + 1) = make_algorithm_spec('V3_HYBRID_A_DIR_STAG', 'BBO_v3_hybrid_A_dir_stag', improved_bbo_root, 'max_iter', 'score_pos_curve'); %#ok<AGROW>
     catalog(end + 1) = make_algorithm_spec('V3_HYBRID_B_DIR_SMALL', 'BBO_v3_hybrid_B_dir_small', improved_bbo_root, 'max_iter', 'score_pos_curve'); %#ok<AGROW>
 

@@ -1,0 +1,3 @@
+[2026-03-13 08:36:11.463] Start experiment: all_compare_smoke
+[2026-03-13 08:36:11.576] Suite: cec2017
+[2026-03-13 08:36:11.592] Primary budget maxFEs: 30000
