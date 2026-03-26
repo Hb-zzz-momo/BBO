@@ -1,7 +1,0 @@
-[2026-03-13 16:16:05.468] [Plot] enabled=1 show=0 save=1
-[2026-03-13 16:16:05.540] [Plot] Generating convergence_curves.
-[2026-03-13 16:16:14.469] [Plot] saved: D:\project\科研\metaopt_cec_lungct_project\src\benchmark\cec_runner\..\..\..\results\cec2017\smoke_plot_20260313_1\figures\convergence_curves\D10\convergence_cec2017_D10_F1.png
-[2026-03-13 16:16:14.574] [Plot] Generating boxplots.
-[2026-03-13 16:16:16.385] [Plot] saved: D:\project\科研\metaopt_cec_lungct_project\src\benchmark\cec_runner\..\..\..\results\cec2017\smoke_plot_20260313_1\figures\boxplots\D10\boxplot_cec2017_D10_F1.png
-[2026-03-13 16:16:16.438] [Plot] Generating friedman_radar.
-[2026-03-13 16:16:16.467] [Plot] skipped friedman_radar: need at least two algorithms and two comparable functions

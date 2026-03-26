@@ -1,0 +1,30 @@
+# Ignore IDE settings
+.idea/
+.vscode/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore environment files
+.env
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore output files (if applicable)
+*.xlsx
+*.csv
+*.h5
+*.pkl
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore for experiment files
+exp_result/
+fs_exp_result/
+logs/

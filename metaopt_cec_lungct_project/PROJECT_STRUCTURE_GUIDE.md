@@ -131,6 +131,7 @@ metaopt_cec_lungct_project/
 - `repro/`: 复现支持（依赖、环境描述、复现实验手册）。
 - `temp/`: 临时文件与草稿，定期清理。
 - `archive/`: 阶段归档与废弃版本，避免污染主目录。
+- `archive/achieve/reference_only/`: 仅供参考的第三方大型代码包（不进入主运行路径）。
 
 ## 3. 命名规范建议
 
@@ -195,3 +196,54 @@ metaopt_cec_lungct_project/
   - 新增数据集: 在 `data/raw/` 与 `data/interim/` 各加同名子目录。
   - 新增任务类型: 在 `experiments/configs/`、`experiments/scripts/`、`results/` 中平行新增同名目录。
   - 新论文主题: 在 `docs/05_paper_drafts/` 新建子目录（按论文或会议名区分）。
+
+## 6. 框架树使用规范（与当前实现同步）
+
+以下规范用于保证当前 CEC benchmark 主线可运行、可复现、可扩展。
+
+### 6.1 入口分层规范（谁给人用，谁给机器用）
+
+- 人工触发主入口固定为 `src/benchmark/cec_runner/entry/run_main_entry.m`。
+- 核心执行入口为 `src/benchmark/cec_runner/core/run_experiment.m`，供入口层和脚本层调用。
+- 兼容入口 `src/benchmark/cec_runner/legacy/run_experiment_unified.m` 仅用于历史脚本兼容，不作为新实验默认入口。
+- 阶段流程入口放在 `src/benchmark/cec_runner/pipelines/`，用于 smoke/formal/ablation 编排，不直接承载底层路径拼接与导出细节。
+
+### 6.2 路径解析规范（防止入口级故障）
+
+- 任何位于 `src/benchmark/cec_runner/core/` 的脚本，计算项目根目录时必须按当前层级回溯到项目根，禁止写成会落到 `src/` 的错误层级。
+- 优先复用统一路径解析函数（如 `resolve_common_paths`、`setup_benchmark_paths`），避免在多个函数里重复手写路径根逻辑。
+- 禁止在核心流程中出现 `.../src/src/...` 这类双重拼接路径。
+- CEC 函数目录切换应保持现有调用链不变：
+  wrapper/main -> Get_Functions_cec2017 或 Get_Functions_cec2022 -> fobj -> optimizer -> cec17_func 或 cec22_func -> input_data。
+
+### 6.3 算法登记与文件一致性规范
+
+- `run_all_compare` 的算法 catalog 必须与真实 `.m` 文件保持一致。
+- 若保留历史算法别名，必须在 catalog 中显式映射到当前真实入口函数，且在 inventory 中保留别名到真实入口的注记，确保可审计。
+- pipeline 中的算法名到文件名映射（如 dual ablation 的 name_from_algorithm）必须与 catalog 同步更新，避免“配置可选但运行报缺文件”。
+
+### 6.4 第三方基线路径隔离规范
+
+- `src/baselines/` 中的第三方原始代码包视为外部基线资产，不参与全局 `genpath`。
+- 运行算法时按“单算法 addpath -> 运行 -> rmpath”模式管理路径，防止 `initialization.m`、`main.m`、`Get_Functions_details.m` 等同名函数串扰。
+- 手动调试时禁止对 `src/baselines/` 做全量递归加路径。
+
+### 6.5 结果与复现规范
+
+- benchmark 结果统一落盘到 `results/<suite>/<experiment_name_or_timestamp>/`。
+- 每轮实验至少保存 `config.mat`、`summary.csv`、`summary.mat`、`raw_runs/`、`curves/`、`logs/`。
+- 任一 runner 增加新导出项时，应同步更新 `experiments/tracking/` 与对应 README/说明文档。
+
+### 6.6 变更边界规范（最小侵入）
+
+- 不改算法语义，不改 CEC mex 机制，不改 benchmark 公平性协议（函数集、维度、预算、runs、指标）。
+- 优先通过 wrapper、映射、配置层和导出层修复问题，避免直接重写算法体。
+- 结构重构遵循“先兼容后收敛”：先保证旧入口可运行，再逐步收敛到主入口。
+
+### 6.7 提交前检查清单
+
+- 是否能通过 `entry/run_main_entry` 启动 smoke。
+- 是否确认 repo_root 解析到项目根而非 `src/`。
+- 是否确认 catalog 中每个默认算法可运行或有明确不可运行说明。
+- 是否确认 pipeline 与 catalog 的算法命名一致。
+- 是否确认输出目录和关键文件自动生成。

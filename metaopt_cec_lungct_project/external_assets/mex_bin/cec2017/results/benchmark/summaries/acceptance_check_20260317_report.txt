@@ -1,0 +1,41 @@
+experiment=acceptance_check_20260317
+suite_status:
+suite=cec2017 result_dir=D:\project\科研\metaopt_cec_lungct_project\results\cec2017\acceptance_check_20260317
+  runtime_path_error=0
+  used_FEs_all_3000=1
+  statuses=completed
+  summary_rows=1
+  curve_end_equals_best=1
+  curve_len=99
+  contour_overview_exists=1
+suite=cec2022 result_dir=D:\project\科研\metaopt_cec_lungct_project\results\cec2022\acceptance_check_20260317
+  runtime_path_error=0
+  used_FEs_all_3000=1
+  statuses=completed
+  summary_rows=1
+  curve_end_equals_best=1
+  curve_len=99
+  contour_overview_exists=1
+profile_top:
+  run | total=42.968587 | self=0.000000 | calls=1
+  acceptance_check_20260317 | total=42.968166 | self=0.000000 | calls=1
+  run_main_entry | total=42.939412 | self=0.000000 | calls=1
+  run_experiment | total=42.721754 | self=0.000000 | calls=1
+  run_suite_batch | total=41.309514 | self=0.000000 | calls=1
+  run_all_compare | total=41.302771 | self=0.000000 | calls=1
+  core\private\rac_generate_result_figures | total=30.554021 | self=0.000000 | calls=2
+  core\private\rac_save_figure_multi_format | total=19.609037 | self=0.000000 | calls=10
+  core\private\rac_plot_algorithm_behavior | total=17.327605 | self=0.000000 | calls=2
+  core\private\rac_plot_convergence_curves | total=13.068855 | self=0.000000 | calls=2
+  core\private\rac_is_path_entry_active | total=11.756412 | self=0.000000 | calls=30
+  core\private\rac_is_path_entry_active>normalize_path_local | total=11.063717 | self=0.000000 | calls=78570
+  core\private\rac_plot_algorithm_behavior>plot_search_process_overview_local | total=8.073248 | self=0.000000 | calls=2
+  core\private\rac_build_suite_api>rac_ensure_cec_runtime_path | total=6.577234 | self=0.000000 | calls=8
+  core\private\rac_save_figure_multi_format>save_by_format | total=5.962166 | self=0.000000 | calls=10
+profile_cd_rows:
+  core\private\rac_build_suite_api>@()cd(old_dir) | total=0.015408 | calls=4
+  ColorBar.determine_cdatamapping | total=0.005357 | calls=8
+  core\private\rac_plot_algorithm_behavior>@()cd(old_dir) | total=0.005330 | calls=2
+  run_all_compare>@()cd(old_dir) | total=0.006452 | calls=2
+profile_addpath_rows:
+  addpath | total=1.762221 | calls=17

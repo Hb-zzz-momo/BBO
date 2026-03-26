@@ -1,9 +1,584 @@
 # Metaheuristic Optimization + CEC + Lung CT Research Project
 
-This folder is a research-oriented project scaffold for:
-- baseline and improved metaheuristic algorithms
-- CEC benchmark experiments
-- lung CT segmentation/enhancement application studies
-- reproducible experiment tracking and paper support
+本 README 是当前项目的统一使用手册，面向以下目标：
 
-See `PROJECT_STRUCTURE_GUIDE.md` for full structure and naming conventions.
+1. BBO 改进算法研究主线推进（本项目语义下 BBO 指 Beaver Behavior Optimizer）
+2. CEC2017 与 CEC2022 基准公平验证
+3. 消融实验与可复现统计导出
+4. 肺 CT 应用验证接口预留与论文结果沉淀
+
+## 0. 结构治理复盘（2026-03-15 至 2026-03-17）
+
+本节是“昨天到现在”的结构治理压缩复盘，目标不是描述单次修 bug，而是沉淀可长期复用的科研仓库治理方法。
+
+### 0.1 阶段化复盘
+
+阶段 1：保守最小改动
+
+1. 动机：先保护 baseline 可运行性、CEC 公平协议、历史结果可复现。
+2. 短期收益：改动风险低，能快速恢复实验链路。
+3. 后续问题：局部补丁开始在入口、路径、兼容层周围累积。
+
+阶段 2：补丁扩散与薄层叠加
+
+1. 动机：兼容历史脚本与新增需求并行。
+2. 短期收益：不改主干也能“先跑通”。
+3. 后续问题：调用链变高，职责变散，重复逻辑增多。
+
+阶段 3：结构性风险显性化
+
+1. 动机：通过 smoke/formal/图表链路验证“语义不变”。
+2. 短期收益：定位到路径、runtime、compat、绘图链路真实阻塞。
+3. 后续问题：问题从单点故障转为结构债，继续补丁收益下降。
+
+阶段 4：转向局部结构收敛
+
+1. 动机：从“能跑”升级为“可维护、可复现、可追溯”。
+2. 短期收益：入口收敛、公共职责下沉、导出链统一、证据链更稳定。
+3. 后续问题：如果协作规则不改，后续自动化改动仍可能回到叠壳模式。
+
+阶段 5：规则层治理（提示词与规范）
+
+1. 动机：把科研主线、公平性、复现性写入硬约束，减少落地偏差。
+2. 短期收益：后续改动更贴合科研仓库目标，不再偏产品工程化。
+3. 深层收益：治理从“人盯人”转为“制度驱动”。
+
+阶段 6：验收与闭环
+
+1. 功能验收：cec2017、cec2022 均可运行。
+2. 公平验收：used_FEs、budget、stop 条件保持一致。
+3. 性能验收：移除每 FE 目录切换后，时间显著回落。
+4. 证据验收：run_log、run_manifest、summary、图表和统计导出齐全。
+
+### 0.2 本轮关键结构改变清单
+
+1. 统一主入口：以 run_main_entry 为推荐人类入口，兼容入口保留但降级为次级。
+2. 执行链收敛：run_all_compare 从巨型文件收敛为薄编排层，重复职责下沉到 core/private。
+3. 配置链统一：default_experiment_config + resolve_experiment_mode 统一 smoke/formal 协议映射。
+4. 导出链统一：protocol_snapshot、summary、manifest、aggregate、统计检验统一导出。
+5. 算法登记统一：algorithm_registry 统一算法选择和 profile 管理。
+6. 路径与冲突治理：增加路径校验、冲突检查和 strict guard 策略。
+7. 第三方硬分层：原始基线与外部资产迁移到 third_party/external_assets，降低误改风险。
+8. 绘图模块拆分：按图类型拆分 convergence/boxplot/radar/behavior，降低耦合。
+9. runtime_dir 策略落地：修复 CEC input_data 读取路径问题，并保持协议不变。
+10. 性能回退修复：移除每 FE 级目录切换，改为 suite 级一次切换，恢复执行效率。
+
+### 0.3 根因归类（治理视角）
+
+1. 策略层：最小改动策略长期化，缺少退出条件。
+2. 架构层：入口、配置、导出职责边界不够清晰。
+3. 目录层：实验执行与分析产物边界曾经不够硬。
+4. 命名层：历史别名、临时命名与新规则并存，增加理解成本。
+5. 协作层：未及时把科研约束固化到提示规则，造成落地偏差。
+6. 科研属性：多算法、多模式、多输出链天然放大冗余风险。
+
+### 0.4 结论与制度化动作
+
+1. 最小改动在“单点问题期”是正确策略，不应被否定。
+2. 一旦出现薄层叠加信号，必须从补丁转向局部收敛。
+3. 提示词和协作规则属于架构的一部分，必须版本化治理。
+4. 判断标准从“能跑”升级为“结构健康 + 证据可追溯 + 论文可复用”。
+
+### 0.5 可复用治理流程（触发到验收）
+
+触发信号：
+
+1. 同类逻辑在多个壳层重复。
+2. 修一个点需要改多个入口。
+3. 结果追溯依赖人工记忆而非稳定目录映射。
+
+排查顺序：
+
+1. 入口链。
+2. 配置链。
+3. 执行链。
+4. 导出链。
+5. 兼容层与历史壳层。
+
+判断标准：
+
+1. 局部整理：问题集中在 1 到 3 个模块，协议不需变更。
+2. 结构重构：入口、配置、导出同时混乱，且壳层持续增殖。
+
+整理动作：
+
+1. 合并入口语义，保留兼容桥接。
+2. 下沉重复逻辑到公共层。
+3. 删除纯转发薄壳。
+4. 固化目录、命名、导出和台账规则。
+
+验收标准：
+
+1. cec2017/cec2022 可运行。
+2. budget/used_FEs/stop 条件一致。
+3. raw/summary/manifest/figures/stats 产物齐全。
+4. 性能瓶颈不由壳层操作主导。
+
+### 0.6 注意事项
+
+1. 本节包含“治理建议”，不是算法创新声明。
+2. 任何结构整理不得改动 CEC 公平协议与 baseline 算法语义。
+3. 历史结果目录只归档不覆写，避免证据链断裂。
+
+### 0.7 近期归档动作（2026-03-19）
+
+1. Route B 与 Route C 的实核源码快照已归档到 archive/achieve/unused_versions/bc_algorithms_20260319_143139。
+2. 活动位 Route B/C 回退为 placeholder 实现，保持接口兼容但不再作为当前活动实核。
+3. results 下按“存在 config.mat+summary.csv 且缺 README.md”规则归档了 30 个实验根目录到 archive/achieve/results_no_readme/20260319_143139。
+4. 该动作属于工程治理，不构成算法创新声明，且未更改 benchmark 协议参数。
+
+### 0.8 Route A Family 主线推进（2026-03-19）
+
+1. 在 active 结构内新增 Route A family 五版本：A_current、A_pbest、A_gated、A_safe、A_pbest_gated。
+2. 新增统一入口 experiments/scripts/run_benchmark/run_route_a_family_smoke.m 与注册表 route_a_family_registry。
+3. 最小 smoke 批次 routeA_family_smoke_20260319_v2 已完成（cec2017, F=[2,10,11,30], runs=5, maxFEs=30000）。
+4. 当前观察：A_current 与 A_safe 稳定性较好；A_pbest 在 F30 上方差风险较高；该结论仅为 smoke 事实，不是最终论文结论。
+
+### 0.9 Route A Budget-Adaptive A/B/C 决策烟测规范（2026-03-20）
+
+1. 统一入口：experiments/scripts/run_benchmark/run_route_a_budget_adaptive_abc_smoke.m。
+2. 默认口径：suite=cec2022，func_ids=[6,7,8,10,11,12]，runs=10，maxFEs=30000（可切 use_long_budget=true 到 300000）。
+
+### 0.10 A vs E 与 rescue 证据导出（2026-03-21）
+
+1. 已在统一 runner 中增加 rescue 证据导出：每批次自动生成 rescue_evidence.csv 与 rescue_evidence_summary.csv。
+2. E 算法诊断发布采用 onCleanup 保底，确保在预算硬停（stopped_at_budget）场景也能落盘 trigger/success 统计。
+3. A vs E 同口径批次（cec2022, F=[6,7,8,10,11,12], runs=10, maxFEs=30000）目录为 results/benchmark/research_pipeline/cec2022/a_vs_e_cec2022_f6_7_8_10_11_12_fes30000_runs10_20260321_153637。
+4. 当前该批次 rescue 证据显示 E 触发统计为 0（trigger_count=0, success_count=0, success_rate=0），说明在当前门控参数下 rescue 未被触发。
+3. 结果新增：route_a_budget_adaptive_abc_decision_table.csv，用于直接查看每个版本 gate 通过状态与综合分数。
+4. 本动作属于工程治理与结果可追溯增强，不构成算法创新声明，也未修改 benchmark 协议定义。
+
+## 1. 项目定位
+
+本仓库是科研实验仓库，不是通用工程产品仓库。
+
+优先级如下：
+
+1. 正确性
+2. 可复现性
+3. 公平性
+4. 结果可分析与论文可用
+5. 最小侵入式迭代改造
+
+## 2. 当前目录结构
+
+下面给出当前主结构和用途。
+
+```text
+metaopt_cec_lungct_project/
+├─ src/
+│  ├─ baselines/
+│  │  └─ metaheuristics/
+│  ├─ improved/
+│  │  └─ algorithms/
+│  │     └─ BBO/
+│  ├─ benchmark/
+│  │  ├─ cec_runner/
+│  │  │  ├─ run_all_compare.m
+│  │  │  ├─ run_experiment_unified.m
+│  │  │  ├─ run_bbo_research_pipeline.m
+│  │  │  ├─ run_v3_direction_reduced_ablation.m
+│  │  │  ├─ run_v3_dual_objective_ablation.m
+│  │  │  ├─ config/
+│  │  │  │  ├─ default_experiment_config.m
+│  │  │  │  ├─ resolve_experiment_mode.m
+│  │  │  │  └─ algorithm_registry.m
+│  │  │  └─ export/
+│  │  │     ├─ export_benchmark_aggregate.m
+│  │  │     └─ export_experiment_summary_md.m
+│  │  └─ metrics/
+│  ├─ medimg/
+│  └─ utils/
+├─ experiments/
+│  ├─ configs/
+│  ├─ scripts/
+│  └─ tracking/
+├─ results/
+├─ logs/
+├─ docs/
+├─ reports/
+└─ repro/
+```
+
+## 3. 统一入口与使用方式
+
+### 3.1 推荐入口
+
+推荐统一入口是 src/benchmark/cec_runner/entry/run_main_entry.m。
+
+该入口负责：
+
+1. 统一配置默认值
+2. smoke 或 formal 模式切换
+3. 算法 profile 选择
+4. 调用 run_all_compare 主控
+5. 统一统计导出与实验摘要导出
+
+### 3.2 快速运行示例
+
+在 MATLAB 中进入 src/benchmark/cec_runner 目录后执行。
+
+Smoke 示例：
+
+```matlab
+cfg = struct();
+cfg.mode = 'smoke';
+cfg.experiment_name_base = 'bbo_unified';
+report = run_main_entry(cfg);
+```
+
+Formal 示例：
+
+```matlab
+cfg = struct();
+cfg.mode = 'formal';
+cfg.experiment_name_base = 'bbo_unified';
+cfg.formal = struct('runs', 5, 'func_ids', struct('cec2017', 1:30, 'cec2022', 1:12));
+report = run_main_entry(cfg);
+```
+
+指定算法 profile：
+
+```matlab
+cfg = struct();
+cfg.mode = 'formal';
+cfg.algorithm_profile = 'research_core';
+report = run_main_entry(cfg);
+```
+
+目录职责请优先参考：
+
+1. src/benchmark/cec_runner/README.md
+2. src/benchmark/cec_runner/docs/README_entrypoints.md
+
+## 4. 核心配置字段规范
+
+统一配置由 src/benchmark/cec_runner/config/default_experiment_config.m 管理。
+
+关键字段如下。
+
+通用协议字段：
+
+1. mode
+2. suites
+3. dim
+4. pop_size
+5. maxFEs
+6. rng_seed
+7. result_root
+8. experiment_name_base
+9. timestamp
+
+配对种子策略（强制）：
+
+1. 同一 suite、同一 function_id、同一 run_id 下，所有算法必须共享同一个 seed。
+2. seed 仅由 base_seed、suite_idx、function_id、run_id 派生，不得引入算法身份分量。
+3. run_manifest.csv 需可复核该口径；若跨算法出现逐 run 完全一致结果，必须结合 exact_match_warnings.csv 做异常核查后再下结论。
+
+运行模式字段：
+
+1. smoke.runs
+2. smoke.func_ids
+3. formal.runs
+4. formal.func_ids
+
+formal 前置门禁（强制）：
+
+1. formal 模式在进入 run_all_compare 前，必须通过 input_data 可读性检查。
+2. cec2017/cec2022 的 runtime_dir 必须解析到 `external_assets/mex_bin/<suite>`，禁止回落到 suite 源目录。
+3. 门禁至少校验 `input_data` 目录存在、非空，且关键文件（`M_1_D<dim>.txt`、`shift_data_1.txt`）可打开读取。
+4. 任一检查失败时直接中止 formal，并输出明确错误，不允许继续执行并产出无效数值。
+
+导出字段：
+
+1. export.aggregate_csv
+2. export.aggregate_xlsx
+3. export.aggregate_mat
+4. export.wilcoxon
+5. export.friedman
+6. export.summary_markdown
+
+输出语言字段：
+
+1. output_language，默认 `zh`
+2. localize_output_files_zh，默认 `false`
+
+可扩展预留字段：
+
+1. objective_wrapper_hook
+2. objective_wrapper_note
+
+说明：
+
+1. objective wrapper 当前仅预留，不改变 benchmark 目标函数语义。
+2. 正式论文结论建议仅基于 formal 结果，不用 smoke 结果下结论。
+
+## 5. 算法注册规范
+
+算法注册入口：src/benchmark/cec_runner/config/algorithm_registry.m。
+
+当前 profile：
+
+1. smoke_minimal
+2. research_core
+3. ablation_v3
+
+每个算法项元信息字段：
+
+1. name
+2. variant_type
+3. track
+4. note
+
+新增算法建议流程：
+
+1. 先保证算法函数接口符合规范
+2. 再登记到 algorithm_registry
+3. 再通过 profile 控制是否进入 smoke 或 formal
+
+## 6. 算法函数接口规范
+
+为了与 benchmark 主控兼容，算法函数应遵循以下输出契约。
+
+```matlab
+[best_fitness, best_solution, Convergence_curve] = ALGO_NAME(N, Max_iteration_or_budget, lb, ub, dim, fobj)
+```
+
+要求：
+
+1. 必须返回 best_fitness
+2. 必须返回 best_solution
+3. 必须返回 Convergence_curve
+4. 输入输出为数值可序列化对象
+5. 不在算法体内写死路径或业务 IO
+
+## 7. FE 公平预算规范
+
+主控执行链以 FE 为主预算，核心在 run_all_compare 的计数包装机制。
+
+规则：
+
+1. maxFEs 是统一公平预算
+2. 超预算触发硬停止机制
+3. 记录 used_FEs 与控制模式到 run_manifest
+4. 保持 baseline 与 improved 同预算口径
+
+## 8. 输出目录与产物规范
+
+每个 suite 的结果目录在 results 下按时间戳实验名组织。
+
+至少包含：
+
+1. config.mat
+2. protocol_snapshot.csv
+3. protocol_snapshot.mat
+4. raw_runs/
+5. curves/
+6. logs/
+7. summary.csv
+8. summary.mat
+9. run_manifest.csv
+10. aggregate_stats.csv
+11. rank_table.csv
+12. wilcoxon_rank_sum.csv
+13. friedman_summary.csv
+14. friedman_ranks.csv
+15. summary_exports.xlsx
+16. experiment_summary.md
+17. aggregate_exports.mat
+18. improved_algorithm_notes.md
+
+中文输出说明：
+
+1. 统一入口默认仅保证 Markdown 内容为中文。
+2. 默认不改动非 Markdown 文件命名，保持英文原文件名兼容既有脚本。
+3. 如果需要中文文件别名，可手动设置 localize_output_files_zh=true。
+
+改进算法说明文档：
+
+1. 每次实验都会自动生成 improved_algorithm_notes.md。
+2. 文档面向改进算法，详细记录“改进了什么、预期收益、预期风险、保持不变项”。
+3. 该文档用于复现与论文方法章节，不替代 formal 统计结论。
+
+## 9. 统计与绘图规范
+
+统计导出：
+
+1. 基础统计：best、mean、std、worst、median、avg_runtime
+2. 排名统计：每函数 rank、整体平均 rank
+3. 显著性统计：Wilcoxon、Friedman（函数可用时执行，不可用则写 note）
+
+绘图导出：
+
+1. convergence curves
+2. boxplots
+3. friedman radar
+
+说明：
+
+1. 绘图由 run_all_compare 统一调度。
+2. summary 与统计导出用于论文表格，绘图用于论文图。
+
+## 10. 消融实验规范
+
+消融实验建议采用以下模式：
+
+1. baseline
+2. improved
+3. ablation variants
+4. controls
+
+并统一输出：
+
+1. improved_count
+2. degraded_count
+3. net_gain
+4. improve_magnitude
+5. degrade_magnitude
+6. std_delta
+7. runtime_ratio
+
+结论门槛建议：
+
+1. formal 模式下有效
+2. 显著性检验可用或有明确降级说明
+3. 分函数与整体统计一致
+
+## 11. Legacy 入口说明
+
+以下入口仍保留，便于兼容历史流程：
+
+1. run_all_compare.m
+2. run_bbo_research_pipeline.m
+3. run_v3_direction_reduced_ablation.m
+4. run_v3_dual_objective_ablation.m
+
+建议：新实验优先使用 run_experiment_unified.m。
+
+## 12. 研究流程建议
+
+推荐执行顺序：
+
+1. smoke（健康检查）
+2. formal（正式统计）
+3. reduced ablation（模块筛选）
+4. full formal（候选收敛后）
+5. 应用验证（后置，不耦合 benchmark 主线）
+
+## 13. 命名与协作规范
+
+1. baseline/improved/ablation 命名语义清晰
+2. 实验名包含主题与时间戳
+3. 不覆盖历史结果目录
+4. 变更后同步更新 experiments/tracking 台账
+
+## 14. 常见问题
+
+Q1：为什么 smoke 结果不能作为论文结论？
+
+A1：smoke 目标是验证脚本和链路健康，不是统计充分性。
+
+Q2：如果 MATLAB 没有统计工具箱怎么办？
+
+A2：wilcoxon/friedman 表会写入 note，标记不可用而不是静默失败。
+
+Q3：当前 BBO 命名冲突如何处理？
+
+A3：保留历史代码命名不做全局替换，论文与报告中明确 BBO 语义为 Beaver Behavior Optimizer，并通过算法 registry 的 track/note 字段区分。
+
+## 15. 参考文档
+
+1. PROJECT_STRUCTURE_GUIDE.md
+2. src/benchmark/cec_runner/README_all.md
+3. src/benchmark/cec_runner/README_research.md
+4. experiments/tracking/research_progress_master.md
+
+## 16. 阶段收口与 achieve 归档规范
+
+每个阶段结束后，必须执行一次“阶段收口”。目标是固定可复用证据，同时把过程性旧版本移出活动区。
+
+收口动作：
+
+1. 保存阶段性定型结果与关键信息到 achieve 冻结目录。
+2. 将过程性旧脚本/旧版本迁移到 achieve 的 unused_versions。
+3. 生成 manifest 和 report，保证后续可追溯。
+
+推荐脚本：
+
+1. experiments/scripts/run_benchmark/finalize_stage_and_archive.m
+
+最小示例：
+
+```matlab
+cfg = struct();
+cfg.stage_name = 'v1_taskc_round3';
+cfg.stable_paths = {
+	'results/benchmark/summaries/v1_taskc_round3_fes30000_20260317'
+	'experiments/tracking/decision_log.md'
+	'experiments/tracking/research_progress_master.md'
+	'experiments/tracking/research_progress_master.csv'
+};
+cfg.process_paths = {
+	'temp/scratch/run_v1_taskc_round1_fes30000_20260317.m'
+	'temp/scratch/run_v1_taskc_round2_small_ablation_20260317.m'
+};
+report = finalize_stage_and_archive(cfg);
+```
+
+固定输出：
+
+1. archive/achieve/stage_freeze/<stage_name>_<timestamp>/stage_manifest.csv
+2. archive/achieve/stage_freeze/<stage_name>_<timestamp>/stage_manifest.mat
+3. archive/achieve/stage_freeze/<stage_name>_<timestamp>/stage_report.md
+4. archive/achieve/unused_versions/<stage_name>_<timestamp>/...
+
+说明：
+
+1. 该流程属于工程治理动作，不改变 benchmark 协议与算法语义。
+2. process_paths 会执行 move，请先确认这些路径不再作为当前活动主线输入。
+
+## 17. 多路线最小原型统一 smoke 框架
+
+针对“新破局点探索”，推荐采用“统一接口 + 多分支最小原型”方式：
+
+1. 每条路线单独实现文件。
+2. 每条路线只保留一个核心创新思想。
+3. 统一 smoke 配置与输出格式。
+4. 先 smoke 对比，再决定 round2 深挖对象。
+
+当前已落地路线：
+
+1. route_a: sel_gdp_reference
+2. route_b: state_driven_bbo
+3. route_c: dimension_selective_bbo
+4. route_d: multi_elite_reference_bbo
+
+统一 smoke 入口：
+
+1. experiments/scripts/run_benchmark/run_bbo_prototype_routes_smoke.m
+
+推荐调用：
+
+```matlab
+addpath('experiments/scripts/run_benchmark');
+cfg = struct();
+cfg.func_ids = [1, 5, 13, 24, 30, 18, 26];
+cfg.maxFEs = 30000;
+cfg.runs = 5;
+cfg.dim = 10;
+cfg.pop_size = 30;
+cfg.experiment_name = 'prototype_routes_smoke_20260317';
+report = run_bbo_prototype_routes_smoke(cfg);
+```
+
+统一输出（在对应结果目录）：
+
+1. route_notes.csv（路线思想/弱点/预期收益/风险）
+2. prototype_routes_compare.csv（mean/std/runtime/win-count）
+3. prototype_routes_round2_recommendation.csv（round2 候选）
+4. prototype_routes_summary.md（汇总说明）
+
+说明：
+
+1. 该框架是原型治理与 smoke 对比机制，不是 formal 结论。
+2. round2 推荐默认使用“胜场 + 均值 + 方差”稳健综合规则，避免单指标误导。

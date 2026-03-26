@@ -1,3 +1,0 @@
-algorithm_name,is_runnable,entry_name,algorithm_dir,budget_arg,fe_control_mode,note
-BBO,1,BBO,D:\project\科研\metaopt_cec_lungct_project\src\benchmark\cec_runner\..\..\..\src\baselines\metaheuristics\BBO\Source_code_BBO_MATLAB_VERSION_extracted\Source_code_BBO_MATLAB_VERSION\CEC2017,max_iter,exact_derived_iteration_from_maxFEs,BBO uses iteration budget; derived Max_iteration=19 gives exact used_FEs=400.
-SBO,1,SBO,D:\project\科研\metaopt_cec_lungct_project\src\benchmark\cec_runner\..\..\..\src\baselines\metaheuristics\SBO\Status_based_Optimization_SBO_MATLAB_codes_extracted\Status-based Optimization (SBO)-2025,maxFEs,exact_fes_parameter,SBO uses MaxFEs directly; counted wrapper records used_FEs.

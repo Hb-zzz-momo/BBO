@@ -1,3 +1,0 @@
-algorithm_name,is_runnable,fe_control_mode,note
-SBO,1,exact_fes_parameter,SBO exposes MaxFEs directly; counted wrapper tracks used_FEs.
-BBO,1,exact_derived_iteration_from_maxFEs,BBO uses Max_iteration only; derived Max_iteration=99 gives exact used_FEs=3000.

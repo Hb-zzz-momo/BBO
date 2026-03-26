@@ -21,7 +21,7 @@
 - src/improved/algorithms/BBO/BBO_v3_dir_small_step.m
 - src/improved/algorithms/BBO/BBO_v3_dir_small_step_late_local_refine.m
 - src/improved/algorithms/BBO/BBO_v3_dir_small_step_gate_late_local_refine.m
-- src/benchmark/cec_runner/run_v3_direction_reduced_ablation.m
+- src/benchmark/cec_runner/pipelines/run_v3_direction_reduced_ablation.m
 
 ---
 
